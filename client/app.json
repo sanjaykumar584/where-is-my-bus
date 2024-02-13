@@ -2,6 +2,7 @@
   "expo": {
     "name": "client",
     "slug": "client",
+    "scheme": "whereIsMyBus",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,6 +27,21 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": ""
+        }
+      }
+    },
+    "ios": {
+      "config": {
+        "googleMapsApiKey": ""
+      }
     }
   }
 }
