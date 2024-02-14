@@ -5,8 +5,8 @@ const HomePage = () => {
     return (
         <View style={styles.container}>
             <Text >Where's My Bus</Text>
-            <Button title="Student" onPress={() => {router.push(`/users/1`)}}/>
-            <Button title="Crew" onPress={() => {router.push("/crew/LocationProviderPage")}}/>
+            <Button title="Student" onPress={() => {router.push(`/users/StudentApp`)}}/>
+            <Button title="Crew" onPress={() => {router.push("/crew/CrewApp")}}/>
         </View>
     )
 }
