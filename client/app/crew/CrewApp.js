@@ -1,108 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, Button } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState, useEffect } from "react";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
-import * as Location from 'expo-location';
 
-function CrewApp() {
-  const [location, setLocation] = useState(null);
-  const [locationData, setLocationData] = useState({});
+const CrewApp = () => {
+  const [busList, setBusList] = useState([]);
 
-  let locationInterval;
+  const fetchBusList = async () => {
+    try {
+      const response = await axios.get('http://192.168.29.205:3001/api/busList');
+      const busData = response.data;
+      setBusList(busData);
+    } catch (error) {
+      console.error('Error fetching bus data:', error);
+    }
+  };
 
   useEffect(() => {
-    let locationInterval;
-  
-    const getLocationAsync = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
-        return;
-      }
-  
-      locationInterval = setInterval(async () => {
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
-        const newLocationData = {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude
-        };
-        setLocationData(newLocationData);
-        sendLocationToServer(newLocationData);
-        console.log(newLocationData.latitude + " " + newLocationData.longitude);
-      }, 5000);
-    };
-  
-    const sendLocationToServer = async (newLocationData) => {
-      try {
-        const response = await axios.post('http://192.168.29.205:3001/api/location', { locationData: newLocationData });
-      } catch (error) {
-        console.error('Error sending location to server:', error);
-      }
-    };
-  
-    getLocationAsync();
-  
-    // Cleanup function
-    return () => {
-      if (locationInterval) {
-        clearInterval(locationInterval);
-        console.log('Location interval cleared');
-      }
-    };
+    fetchBusList();
   }, []);
 
-  const seatingCapacity = async () => {
+  const busButton = async (busNumber) => {
     try {
-      const response = await axios.post('http://192.168.29.205:3001/api/seatCapacity', { percentSeatsFilled: 100 });
+      const response = await axios.post('http://192.168.29.205:3001/api/getBusLocation', {
+        busNumber: busNumber,
+        method: "get"
+      });
+      console.log("Response:", response.data);
     } catch (error) {
-      console.error('Error sending seating capacity to server:', error);
+      console.error('Error fetching bus data:', error);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Crew's Mobile App</Text>
-      {location && (
-        <MapView
-          style={styles.map}
-          region={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.02,
-            longitudeDelta: 0.02,
-          }}
+      <Text>This is the Crew's app</Text>
+      {busList.map((busNumber, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() => busButton(busNumber)}
+          style={{ marginVertical: 10, padding: 10, backgroundColor: 'grey' }}
         >
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title="Crew's Location"
-            description={`Latitude: ${location.coords.latitude}, Longitude: ${location.coords.longitude}`}
-          >
-            <Image
-              source={require('../../src/assets/bus-stop.png')}
-              style={{ width: 40, height: 40 }}
-            />
-          </Marker>
-        </MapView>
-      )}
-      <Text >Is the Bus full?</Text>
-      <Button title='Yes' onPress={() => {seatingCapacity()}}/>
+          <Text style={{ color: 'white', fontSize: 16 }}>{busNumber}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  map: {
-    width: '100%',
-    height: '80%',
+    alignItems: 'center',
   },
 });
 
