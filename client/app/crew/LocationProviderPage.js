@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, Button } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from "axios";
 import * as Location from 'expo-location';
 
-function CrewApp() {
+function LocationProviderPage() {
   const [location, setLocation] = useState(null);
   const [locationData, setLocationData] = useState({});
 
@@ -52,14 +52,6 @@ function CrewApp() {
     };
   }, []);
 
-  const seatingCapacity = async () => {
-    try {
-      const response = await axios.post('http://192.168.29.205:3001/api/seatCapacity', { percentSeatsFilled: 100 });
-    } catch (error) {
-      console.error('Error sending seating capacity to server:', error);
-    }
-  }
-
   return (
     <View style={styles.container}>
       <Text>Crew's Mobile App</Text>
@@ -80,30 +72,19 @@ function CrewApp() {
             }}
             title="Crew's Location"
             description={`Latitude: ${location.coords.latitude}, Longitude: ${location.coords.longitude}`}
-          >
-            <Image
-              source={require('../../src/assets/bus-stop.png')}
-              style={{ width: 40, height: 40 }}
-            />
-          </Marker>
+          />
         </MapView>
       )}
-      <Text >Is the Bus full?</Text>
-      <Button title='Yes' onPress={() => {seatingCapacity()}}/>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  map: {
-    width: '100%',
-    height: '80%',
+    alignItems: 'center',
   },
 });
 
-export default CrewApp;
+export default LocationProviderPage;
